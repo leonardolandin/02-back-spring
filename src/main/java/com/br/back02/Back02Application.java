@@ -1,4 +1,4 @@
-package com.example.back02;
+package com.br.back02;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
