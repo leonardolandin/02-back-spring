@@ -19,7 +19,6 @@ public class TokenService {
 
     private final JwtUtils jwtUtils;
 
-
     public Token create(User user) throws TokenException {
         try {
             Map<String, Object> data = new HashMap<>();
@@ -32,5 +31,11 @@ public class TokenService {
         } catch(TokenException e) {
             throw new TokenException(e.getMessage());
         }
+    }
+
+    public String decode(String token) throws TokenException {
+        Map<String, Object> jwt = jwtUtils.verifyToken(token);
+
+        return jwt.get("id").toString();
     }
 }

@@ -1,11 +1,12 @@
 package com.br.back02.utils;
 
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.br.back02.exception.TokenException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -30,5 +31,23 @@ public class JwtUtils {
         } catch(JWTCreationException e) {
                throw new TokenException(e.getMessage());
         }
+    }
+
+    public Map<String, Object> verifyToken(String token) throws TokenException {
+        Map<String, Object> payload = getTokenPayload(token);
+
+        if(payload.get("email") == null || payload.get("email").toString().equals(""))
+            throw new TokenException("Não foi possivel recuperar o token");
+
+        return payload;
+    }
+
+    private Map<String, Object> getTokenPayload(String token) {
+        Algorithm algorithm = Algorithm.HMAC256(secret);
+        JWTVerifier verifier = JWT.require(algorithm)
+                .acceptExpiresAt(10)
+                .build();
+        DecodedJWT jwt = verifier.verify(token);
+        return jwt.getClaim(secret).asMap();
     }
 }
