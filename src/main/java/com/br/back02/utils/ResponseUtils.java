@@ -3,10 +3,12 @@ package com.br.back02.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Component
 public class ResponseUtils {
     private static final Logger log = LoggerFactory.getLogger(ResponseUtils.class);
 

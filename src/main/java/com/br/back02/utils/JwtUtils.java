@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.br.back02.exception.TokenException;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,12 +43,16 @@ public class JwtUtils {
         return payload;
     }
 
-    private Map<String, Object> getTokenPayload(String token) {
-        Algorithm algorithm = Algorithm.HMAC256(secret);
-        JWTVerifier verifier = JWT.require(algorithm)
-                .acceptExpiresAt(10)
-                .build();
-        DecodedJWT jwt = verifier.verify(token);
-        return jwt.getClaim(secret).asMap();
+    private Map<String, Object> getTokenPayload(String token) throws TokenExpiredException {
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(secret);
+            JWTVerifier verifier = JWT.require(algorithm)
+                    .acceptExpiresAt(10)
+                    .build();
+            DecodedJWT jwt = verifier.verify(token);
+            return jwt.getClaim(secret).asMap();
+        } catch(TokenExpiredException e) {
+            throw new TokenExpiredException("Token expirado");
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.br.back02.validator;
 
 import com.br.back02.exception.RecaptchaException;
+import com.br.back02.utils.RequestUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
@@ -22,7 +23,13 @@ public class RecaptchaValidator {
     @Value("${02.recaptcha.secret}")
     private String secret;
 
+    private final RequestUtils requestUtils;
+
     private static final String RECAPTCHA_URL = "https://www.google.com/recaptcha/api/siteverify";
+
+    public RecaptchaValidator(RequestUtils requestUtils) {
+        this.requestUtils = requestUtils;
+    }
 
 
     public boolean validate(String token) throws RecaptchaException {
@@ -47,35 +54,11 @@ public class RecaptchaValidator {
 
     private JSONObject requestRecaptcha(String recaptchaFrontendToken, String userAgent, String ip)
             throws IOException, JSONException {
-        java.net.URL obj = new URL(RECAPTCHA_URL);
-        HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
-
-        con.setRequestMethod("POST");
-        con.setRequestProperty("User-Agent", userAgent);
-        con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
         String postParams = "secret=" + secret + "&response="
                 + recaptchaFrontendToken + "&remoteip=" + ip;
 
-        con.setDoOutput(true);
-        DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-        wr.writeBytes(postParams);
-        wr.flush();
-        wr.close();
-
-        BufferedReader in = new BufferedReader(new InputStreamReader(
-                con.getInputStream()));
-        String inputLine;
-
-        StringBuffer response = new StringBuffer();
-
-        while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
-        }
-
-        in.close();
-
-        JSONObject myObject = new JSONObject(response.toString());
+        JSONObject myObject = requestUtils.POST(RECAPTCHA_URL, postParams, userAgent);
 
         return myObject;
     }
