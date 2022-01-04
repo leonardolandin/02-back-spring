@@ -16,10 +16,10 @@ import java.util.Map;
 @Component
 public class JwtUtils {
 
-    @Value("${02.jwt.secret}")
+    @Value("${zerotwo.jwt.secret}")
     private String secret;
 
-    @Value("${02.jwt.expires}")
+    @Value("${zerotwo.jwt.expires}")
     private Long expires;
 
     public String generateToken(Map<String, Object> data) throws TokenException {

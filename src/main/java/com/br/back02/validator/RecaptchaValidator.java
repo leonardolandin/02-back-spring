@@ -9,18 +9,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.http.HttpServletRequest;
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
 
 @Component
 public class RecaptchaValidator {
 
-    @Value("${02.recaptcha.secret}")
+    @Value("${zerotwo.recaptcha.secret}")
     private String secret;
 
     private final RequestUtils requestUtils;

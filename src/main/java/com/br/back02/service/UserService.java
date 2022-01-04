@@ -91,4 +91,13 @@ public class UserService {
         }
     }
 
+    public User getUserByEmail(String email) {
+        Optional<User> user = userRepository.findByEmailAndActiveIsTrue(email);
+
+        if(user.isPresent())
+            return user.get();
+
+        return null;
+    }
+
 }

@@ -3,12 +3,15 @@ package com.br.back02.controller;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.br.back02.domain.User;
 import com.br.back02.dto.UserRegisterDTO;
+import com.br.back02.exception.EmailException;
 import com.br.back02.exception.RecaptchaException;
 import com.br.back02.exception.TokenException;
 import com.br.back02.utils.ResponseUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +20,9 @@ import com.br.back02.dto.UserLoginDTO;
 import com.br.back02.exception.UserException;
 import com.br.back02.service.AuthService;
 
+import javax.servlet.http.HttpServletRequest;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.util.Map;
 
@@ -44,7 +50,7 @@ public class AuthController {
         }
     }
 
-    @PostMapping(path = "/userLogged",
+    @PostMapping(path = "/user-logged",
                 consumes = MediaType.APPLICATION_JSON_VALUE,
                 produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> userLogged(@RequestBody Map<String, String> data) {
@@ -71,6 +77,20 @@ public class AuthController {
             return new ResponseEntity<>(responseUtils.response(e.getMessage(), e), HttpStatus.BAD_REQUEST);
         } catch (TokenException | ParseException e) {
             return new ResponseEntity<>(responseUtils.response(e.getMessage(), e), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping(path = "/forgot-password",
+                consumes = MediaType.APPLICATION_JSON_VALUE,
+                produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> data, HttpServletRequest request) {
+        try {
+            String host = request.getHeader(HttpHeaders.ORIGIN) != null ? request.getHeader(HttpHeaders.ORIGIN) :
+                    InetAddress.getLocalHost().getHostAddress();
+            authService.forgotPassword(data.get("email"), host);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch(EmailException | UnknownHostException e) {
+            return new ResponseEntity<>(responseUtils.response(e.getMessage(), e), HttpStatus.BAD_REQUEST);
         }
     }
 }
